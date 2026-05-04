@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .quiz-info {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        #quizForm {
+            margin-bottom: 20px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .question:hover {
+            background: #f0f2f8;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .question p {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            border: 2px solid #e0e0e0;
+        }
+
+        .option-label:hover {
+            border-color: #667eea;
+            background: #f0f2f8;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        input[type="radio"]:checked + label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #submitBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        #submitBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        #submitBtn:active {
+            transform: translateY(0);
+        }
+
+        #resetBtn {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        #resetBtn:hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        #result.show {
+            display: block;
+        }
+
+        #result h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .score-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score-percentage {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-text {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .result-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid;
+            background: white;
+        }
+
+        .result-item.correct {
+            border-left-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .result-item.incorrect {
+            border-left-color: #f44336;
+            background: #fef5f5;
+        }
+
+        .result-item.correct p {
+            color: #4caf50;
+        }
+
+        .result-item.incorrect p {
+            color: #f44336;
+        }
+
+        .result-item p {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .result-item span {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .question {
+                padding: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #856404;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-header">
+            <h1>📝 Online Quiz</h1>
+            <p class="quiz-info">Test your knowledge</p>
+        </div>
+
+        <div class="alert" id="alert">Please answer all questions before submitting!</div>
+
+        <form id="quizForm">
+            <div class="question">
+                <p>1. What is the capital of France?</p>
+                <div class="options">
+                    <label class="option-label">
+                        <input type="radio" name="q1" value="Paris">
+                        <label>Paris</label>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1" value="London">
+                        <label>London</label>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q1" value="Berlin">
+                        <label>Berlin</label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. What is 2 + 2?</p>
+                <div class="options">
+                    <label class="option-label">
+                        <input type="radio" name="q2" value="4">
+                        <label>4</label>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2" value="5">
+                        <label>5</label>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q2" value="6">
+                        <label>6</label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. Which planet is known as the Red Planet?</p>
+                <div class="options">
+                    <label class="option-label">
+                        <input type="radio" name="q3" value="Venus">
+                        <label>Venus</label>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q3" value="Mars">
+                        <label>Mars</label>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="q3" value="Jupiter">
+                        <label>Jupiter</label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="submitBtn" onclick="submitQuiz()">Submit Quiz</button>
+                <button type="reset" id="resetBtn" onclick="resetQuiz()">Reset</button>
+            </div>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function submitQuiz() {
+            const answers = { q1: 'Paris', q2: '4', q3: 'Mars' };
+            const alert = document.getElementById('alert');
+            alert.classList.remove('show');
+
+            // Check if all questions are answered
+            for (let q in answers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                if (!selected) {
+                    alert.classList.add('show');
+                    return;
+                }
+            }
+
+            let score = 0;
+            let resultHTML = '<h3>📊 Your Results</h3><div class="score-display"><div class="score-percentage">0%</div><div class="score-text">Score</div></div>';
+
+            for (let q in answers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                const isCorrect = selected.value === answers[q];
+                if (isCorrect) score++;
+
+                const qNum = q.slice(1);
+                const resultClass = isCorrect ? 'correct' : 'incorrect';
+                const icon = isCorrect ? '✓' : '✗';
+                const status = isCorrect ? 'Correct' : 'Incorrect';
+
+                resultHTML += `
+                    <div class="result-item ${resultClass}">
+                        <p>${icon} Question ${qNum}: ${status}</p>
+                        <span>${isCorrect ? 'Well done!' : `Correct answer: ${answers[q]}`}</span>
+                    </div>
+                `;
+            }
+
+            const percentage = (score / Object.keys(answers).length) * 100;
+            resultHTML = resultHTML.replace('0%', `${percentage.toFixed(0)}%`);
+            resultHTML += `<p style="text-align: center; margin-top: 15px; color: #666;"><strong>Total Score: ${score}/${Object.keys(answers).length}</strong></p>`;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = resultHTML;
+            resultDiv.classList.add('show');
+        }
+
+        function resetQuiz() {
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('alert').classList.remove('show');
+            document.getElementById('quizForm').reset();
+        }
+    </script>
+</body>
+</html>
